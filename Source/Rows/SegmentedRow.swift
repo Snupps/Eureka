@@ -28,11 +28,8 @@ import Foundation
 
 open class SegmentedCell<T: Equatable> : Cell<T>, CellType {
     
-    open var titleLabel : UILabel? {
-        textLabel?.translatesAutoresizingMaskIntoConstraints = false
-        textLabel?.setContentHuggingPriority(500, for: .horizontal)
-        return textLabel
-    }
+    open var titleLabel : UILabel?
+    
     lazy open var segmentedControl : UISegmentedControl = {
         let result = UISegmentedControl()
         result.translatesAutoresizingMaskIntoConstraints = false
@@ -43,17 +40,6 @@ open class SegmentedCell<T: Equatable> : Cell<T>, CellType {
     
     required public init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationWillResignActive, object: nil, queue: nil){ [weak self] notification in
-            guard let me = self else { return }
-            me.titleLabel?.removeObserver(me, forKeyPath: "text")
-        }
-        NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidBecomeActive, object: nil, queue: nil){ [weak self] notification in
-            self?.titleLabel?.addObserver(self!, forKeyPath: "text", options: NSKeyValueObservingOptions.old.union(.new), context: nil)
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.UIContentSizeCategoryDidChange, object: nil, queue: nil){ [weak self] notification in
-            self?.setNeedsUpdateConstraints()
-        }
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -64,15 +50,18 @@ open class SegmentedCell<T: Equatable> : Cell<T>, CellType {
         segmentedControl.removeTarget(self, action: nil, for: .allEvents)
         titleLabel?.removeObserver(self, forKeyPath: "text")
         imageView?.removeObserver(self, forKeyPath: "image")
-        NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationWillResignActive, object: nil)
-        NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
-        NotificationCenter.default.removeObserver(self, name: Notification.Name.UIContentSizeCategoryDidChange, object: nil)
     }
     
     open override func setup() {
         super.setup()
         height = { BaseRow.estimatedRowHeight }
         selectionStyle = .none
+        
+        textLabel?.translatesAutoresizingMaskIntoConstraints = false
+        textLabel?.setContentHuggingPriority(500, for: .horizontal)
+
+        titleLabel = textLabel
+        
         contentView.addSubview(titleLabel!)
         contentView.addSubview(segmentedControl)
         titleLabel?.addObserver(self, forKeyPath: "text", options: [.old, .new], context: nil)

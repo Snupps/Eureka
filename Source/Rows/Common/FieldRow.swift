@@ -122,15 +122,8 @@ extension TextFieldCell {
 }
 
 open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: Equatable, T: InputTypeInitiable {
-    
     public var textField: UITextField
-    
-    open var titleLabel : UILabel? {
-        textLabel?.translatesAutoresizingMaskIntoConstraints = false
-        textLabel?.setContentHuggingPriority(500, for: .horizontal)
-        textLabel?.setContentCompressionResistancePriority(1000, for: .horizontal)
-        return textLabel
-    }
+    open var titleLabel: UILabel?
     
     open var dynamicConstraints = [NSLayoutConstraint]()
     
@@ -140,18 +133,6 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
         textField.translatesAutoresizingMaskIntoConstraints = false
         
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationWillResignActive, object: nil, queue: nil){ [weak self] notification in
-            guard let me = self else { return }
-            me.titleLabel?.removeObserver(me, forKeyPath: "text")
-        }
-        NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidBecomeActive, object: nil, queue: nil){ [weak self] notification in
-            self?.titleLabel?.addObserver(self!, forKeyPath: "text", options: NSKeyValueObservingOptions.old.union(.new), context: nil)
-        }
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name.UIContentSizeCategoryDidChange, object: nil, queue: nil){ [weak self] notification in
-            self?.setNeedsUpdateConstraints()
-        }
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -163,13 +144,17 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
         textField.removeTarget(self, action: nil, for: .allEvents)
         titleLabel?.removeObserver(self, forKeyPath: "text")
         imageView?.removeObserver(self, forKeyPath: "image")
-        NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationWillResignActive, object: nil)
-        NotificationCenter.default.removeObserver(self, name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
-        NotificationCenter.default.removeObserver(self, name: Notification.Name.UIContentSizeCategoryDidChange, object: nil)
     }
     
     open override func setup() {
         super.setup()
+        
+        textLabel?.translatesAutoresizingMaskIntoConstraints = false
+        textLabel?.setContentHuggingPriority(500, for: .horizontal)
+        textLabel?.setContentCompressionResistancePriority(1000, for: .horizontal)
+        
+        titleLabel = self.textLabel
+        
         selectionStyle = .none
         contentView.addSubview(titleLabel!)
         contentView.addSubview(textField)
