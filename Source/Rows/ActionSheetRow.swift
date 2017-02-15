@@ -64,7 +64,7 @@ public class _ActionSheetRow<Cell: CellType>: OptionsRow<Cell>, PresenterRowType
             },
             onDismiss: { [weak self] in
                 $0.dismiss(animated: true)
-                self?.cell?.formViewController()?.tableView?.reloadData()
+                self?.cell?.formViewController()?.tableView.reloadData()
             })
     }()
     
