@@ -124,7 +124,8 @@ extension TextFieldCell {
 open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: Equatable, T: InputTypeInitiable {
     public var textField: UITextField
     open var titleLabel: UILabel?
-    
+    fileprivate var observingTitleText: Bool = false
+
     open var dynamicConstraints = [NSLayoutConstraint]()
     
     public required init(style: UITableViewCellStyle, reuseIdentifier: String?) {
@@ -142,7 +143,9 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
     deinit {
         textField.delegate = nil
         textField.removeTarget(self, action: nil, for: .allEvents)
-        titleLabel?.removeObserver(self, forKeyPath: "text")
+        if observingTitleText {
+            titleLabel?.removeObserver(self, forKeyPath: "text")
+        }
         imageView?.removeObserver(self, forKeyPath: "image")
     }
     
@@ -158,8 +161,9 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
         selectionStyle = .none
         contentView.addSubview(titleLabel!)
         contentView.addSubview(textField)
-        
+
         titleLabel?.addObserver(self, forKeyPath: "text", options: NSKeyValueObservingOptions.old.union(.new), context: nil)
+        observingTitleText = true
         imageView?.addObserver(self, forKeyPath: "image", options: NSKeyValueObservingOptions.old.union(.new), context: nil)
         textField.addTarget(self, action: #selector(_FieldCell.textFieldDidChange(_:)), for: .editingChanged)
         
@@ -284,6 +288,9 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
             let errorDesc: AutoreleasingUnsafeMutablePointer<NSString?>? = nil
             if formatter.getObjectValue(value, for: textValue, errorDescription: errorDesc) {
                 row.value = value.pointee as? T
+            }
+            else{
+                row.value = textValue.isEmpty ? nil : (T.init(string: textValue) ?? row.value)
             }
         }
     }

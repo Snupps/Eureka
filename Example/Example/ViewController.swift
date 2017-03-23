@@ -132,7 +132,7 @@ class RowsExampleViewController: FormViewController {
         CheckRow.defaultCellSetup = { cell, row in cell.tintColor = .orange }
         DateRow.defaultRowInitializer = { row in row.minimumDate = Date() }
 
-        form =
+        form +++
             
             Section()
             
@@ -219,7 +219,23 @@ class RowsExampleViewController: FormViewController {
                         $0.value = 👦🏼
                         $0.selectorTitle = "Choose an Emoji!"
                     }
-            
+
+                <<< PushRow<Emoji>() {
+                    $0.title = "SectionedPushRow"
+                    $0.options = [💁🏻, 🍐, 👦🏼, 🐗, 🐼, 🐻]
+                    $0.value = 👦🏼
+                    $0.selectorTitle = "Choose an Emoji!"
+                    }.onPresent { from, to in
+                        to.sectionKeyForValue = { option in
+                            switch option {
+                            case 💁🏻, 👦🏼: return "People"
+                            case 🐗, 🐼, 🐻: return "Animals"
+                            case 🍐: return "Food"
+                            default: return ""
+                            }
+                        }
+        }
+
         
         if UIDevice.current.userInterfaceIdiom == .pad {
             let section = form.last!
@@ -252,7 +268,24 @@ class RowsExampleViewController: FormViewController {
                     .onPresent { from, to in
                         to.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: from, action: #selector(RowsExampleViewController.multipleSelectorDone(_:)))
                     }
-            
+        
+                <<< MultipleSelectorRow<Emoji>() {
+                    $0.title = "SectionedMultipleSelectorRow"
+                    $0.options = [💁🏻, 🍐, 👦🏼, 🐗, 🐼, 🐻]
+                    $0.value = [👦🏼, 🍐, 🐗]
+                    }
+                    .onPresent { from, to in
+                        to.sectionKeyForValue = { option in
+                            switch option {
+                            case 💁🏻, 👦🏼: return "People"
+                            case 🐗, 🐼, 🐻: return "Animals"
+                            case 🍐: return "Food"
+                            default: return ""
+                            }
+                        }
+                        to.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: from, action: #selector(RowsExampleViewController.multipleSelectorDone(_:)))
+        }
+        
         form +++ Section("Generic picker")
             
                 <<< PickerRow<String>("Picker Row") { (row : PickerRow<String>) -> Void in
@@ -261,7 +294,15 @@ class RowsExampleViewController: FormViewController {
                     for i in 1...10{
                         row.options.append("option \(i)")
                     }
-                
+                }
+            
+                <<< PickerInputRow<String>("Picker Input Row"){
+                    $0.title = "Options"
+                    $0.options = []
+                    for i in 1...10{
+                        $0.options.append("option \(i)")
+                    }
+                    $0.value = $0.options.first
                 }
         
             +++ Section("FieldRow examples")
@@ -467,7 +508,7 @@ class NavigationAccessoryController : FormViewController {
                     $0.title = "Navigation accessory view"
                     $0.value = self.navigationOptions != .Disabled
                 }.onChange { [weak self] in
-                    if $0.value == true {
+                    if $0.value ?? false {
                         self?.navigationOptions = self?.navigationOptionsBackup
                         self?.form.rowBy(tag: "set_disabled")?.baseValue = self?.navigationOptions?.contains(.StopDisabledRow)
                         self?.form.rowBy(tag: "set_skip")?.baseValue = self?.navigationOptions?.contains(.SkipCanNotBecomeFirstResponderRow)
@@ -657,6 +698,7 @@ class NativeEventFormViewController : FormViewController {
                     $0.value = .Never
                 }.onPresent({ (_, vc) in
                     vc.enableDeselection = false
+                    vc.dismissOnSelection = false
                 })
         
         form +++
