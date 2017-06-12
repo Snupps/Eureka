@@ -92,14 +92,6 @@ open class Cell<T: Equatable> : BaseCell, TypedCellType {
     /// The row associated to this cell
     public weak var row: RowOf<T>!
 
-    /// Returns the navigationAccessoryView if it is defined or calls super if not.
-    override open var inputAccessoryView: UIView? {
-        if let v = formViewController()?.inputAccessoryView(for: row) {
-            return v
-        }
-        return super.inputAccessoryView
-    }
-
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
