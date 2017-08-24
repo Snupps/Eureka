@@ -945,7 +945,7 @@ extension FormViewController {
         
 
         let keyBoardFrame = tableView.window!.convert(endFrame.cgRectValue, to: tableView.superview)
-        let newBottomInset = tableView.frame.origin.y + tableView.frame.size.height - keyBoardFrame.origin.y
+        let newBottomInset = tableView.frame.origin.y + tableView.frame.size.height - keyBoardFrame.origin.y + rowKeyboardSpacing
         var tableInsets = tableView.contentInset
         var scrollIndicatorInsets = tableView.scrollIndicatorInsets
 
