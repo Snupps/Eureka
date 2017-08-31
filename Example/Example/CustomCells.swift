@@ -263,7 +263,7 @@ public class _FloatLabelCell<T>: Cell<T>, UITextFieldDelegate, TextFieldCell whe
 
     public func textFieldDidEndEditing(_ textField: UITextField) {
         formViewController()?.endEditing(of: self)
-        formViewController()?.textInputDidEndEditing(textField, cell: self)
+        formViewController()?.form.delegate?.textInputDidEndEditing(textField, cell: self)
         textFieldDidChange(textField)
         textField.text = displayValue(useFormatter: (row as? FormatterConformance)?.formatter != nil)
     }

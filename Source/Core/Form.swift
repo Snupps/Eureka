@@ -33,6 +33,15 @@ public protocol FormDelegate : class {
     func rowsHaveBeenRemoved(_ rows: [BaseRow], at: [IndexPath])
     func rowsHaveBeenReplaced(oldRows: [BaseRow], newRows: [BaseRow], at: [IndexPath])
     func valueHasBeenChanged(for: BaseRow, oldValue: Any?, newValue: Any?)
+
+    // TextInput
+    func textInputShouldBeginEditing<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool    
+    func textInputDidBeginEditing<T>(_ textInput: UITextInput, cell: Cell<T>)
+    func textInputShouldEndEditing<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool
+    func textInputDidEndEditing<T>(_ textInput: UITextInput, cell: Cell<T>)
+    func textInput<T>(_ textInput: UITextInput, shouldChangeCharactersInRange range: NSRange, replacementString string: String, cell: Cell<T>) -> Bool
+    func textInputShouldClear<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool
+    func textInputShouldReturn<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool
 }
 
 // MARK: Form

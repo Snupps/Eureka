@@ -344,7 +344,7 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
 
     open func textFieldDidBeginEditing(_ textField: UITextField) {
         formViewController()?.beginEditing(of: self)
-        formViewController()?.textInputDidBeginEditing(textField, cell: self)
+        formViewController()?.form.delegate?.textInputDidBeginEditing(textField, cell: self)
         if let fieldRowConformance = row as? FormatterConformance, let _ = fieldRowConformance.formatter, fieldRowConformance.useFormatterOnDidBeginEditing ?? fieldRowConformance.useFormatterDuringInput {
             textField.text = displayValue(useFormatter: true)
         } else {
@@ -354,13 +354,13 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
 
     open func textFieldDidEndEditing(_ textField: UITextField) {
         formViewController()?.endEditing(of: self)
-        formViewController()?.textInputDidEndEditing(textField, cell: self)
+        formViewController()?.form.delegate?.textInputDidEndEditing(textField, cell: self)
         textFieldDidChange(textField)
         textField.text = displayValue(useFormatter: (row as? FormatterConformance)?.formatter != nil)
     }
 
     open func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        return formViewController()?.textInputShouldReturn(textField, cell: self) ?? true
+        return formViewController()?.form.delegate?.textInputShouldReturn(textField, cell: self) ?? true
     }
 
     open func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -368,15 +368,15 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
     }
 
     open func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        return formViewController()?.textInputShouldBeginEditing(textField, cell: self) ?? true
+        return formViewController()?.form.delegate?.textInputShouldBeginEditing(textField, cell: self) ?? true
     }
 
     open func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        return formViewController()?.textInputShouldClear(textField, cell: self) ?? true
+        return formViewController()?.form.delegate?.textInputShouldClear(textField, cell: self) ?? true
     }
 
     open func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-        return formViewController()?.textInputShouldEndEditing(textField, cell: self) ?? true
+        return formViewController()?.form.delegate?.textInputShouldEndEditing(textField, cell: self) ?? true
 	}
 	
 	open override func layoutSubviews() {

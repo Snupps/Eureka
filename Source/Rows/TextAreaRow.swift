@@ -166,7 +166,7 @@ open class _TextAreaCell<T> : Cell<T>, UITextViewDelegate, AreaCell where T: Equ
 
     open func textViewDidBeginEditing(_ textView: UITextView) {
         formViewController()?.beginEditing(of: self)
-        formViewController()?.textInputDidBeginEditing(textView, cell: self)
+        formViewController()?.form.delegate?.textInputDidBeginEditing(textView, cell: self)
         if let textAreaConformance = (row as? TextAreaConformance), let _ = textAreaConformance.formatter, textAreaConformance.useFormatterOnDidBeginEditing ?? textAreaConformance.useFormatterDuringInput {
             textView.text = self.displayValue(useFormatter: true)
         } else {
@@ -176,7 +176,7 @@ open class _TextAreaCell<T> : Cell<T>, UITextViewDelegate, AreaCell where T: Equ
 
     open func textViewDidEndEditing(_ textView: UITextView) {
         formViewController()?.endEditing(of: self)
-        formViewController()?.textInputDidEndEditing(textView, cell: self)
+        formViewController()?.form.delegate?.textInputDidEndEditing(textView, cell: self)
         textViewDidChange(textView)
         textView.text = displayValue(useFormatter: (row as? FormatterConformance)?.formatter != nil)
     }
@@ -226,11 +226,11 @@ open class _TextAreaCell<T> : Cell<T>, UITextViewDelegate, AreaCell where T: Equ
     }
 
     open func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-        return formViewController()?.textInputShouldBeginEditing(textView, cell: self) ?? true
+        return formViewController()?.form.delegate?.textInputShouldBeginEditing(textView, cell: self) ?? true
     }
 
     open func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
-        return formViewController()?.textInputShouldEndEditing(textView, cell: self) ?? true
+        return formViewController()?.form.delegate?.textInputShouldEndEditing(textView, cell: self) ?? true
     }
 
     open override func updateConstraints() {
