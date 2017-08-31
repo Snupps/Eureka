@@ -32,6 +32,7 @@ public protocol FieldRowConformance : FormatterConformance {
     var titlePercentage : CGFloat? { get set }
     var placeholder : String? { get set }
     var placeholderColor : UIColor? { get set }
+    var maxLength: Int? { get set }
 }
 
 extension Int: InputTypeInitiable {
@@ -102,6 +103,9 @@ open class FieldRow<Cell: CellType>: FormatteableRow<Cell>, FieldRowConformance,
     /// The placeholder for the textField
     open var placeholder: String?
 
+    // maxLength of the field
+    open var maxLength: Int?
+    
     /// The textColor for the textField's placeholder
     open var placeholderColor: UIColor?
 
@@ -364,7 +368,21 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
     }
 
     open func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        return formViewController()?.textInput(textField, shouldChangeCharactersInRange:range, replacementString:string, cell: self) ?? true
+        let retVal = formViewController()?.form.delegate?.textInput(textField, shouldChangeCharactersInRange:range, replacementString:string, cell: self) ?? true
+        
+        
+        guard let maxLength = (row as? FieldRowConformance)?.maxLength, retVal else {
+            return retVal
+        }
+        
+        guard let value = row?.value as? String else {
+            return retVal
+        }
+        
+        let nsText = NSString(string: string)
+        let nsValue = NSString(string: value)
+        
+        return nsValue.length + nsText.length - range.length <= maxLength
     }
 
     open func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {

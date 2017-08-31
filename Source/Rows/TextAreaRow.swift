@@ -32,6 +32,7 @@ public enum TextAreaHeight {
 protocol TextAreaConformance: FormatterConformance {
     var placeholder: String? { get set }
     var textAreaHeight: TextAreaHeight { get set }
+    var maxLength: Int? { get set }
 }
 
 /**
@@ -222,7 +223,20 @@ open class _TextAreaCell<T> : Cell<T>, UITextViewDelegate, AreaCell where T: Equ
     }
 
     open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        return formViewController()?.textInput(textView, shouldChangeCharactersInRange: range, replacementString: text, cell: self) ?? true
+        let retVal = formViewController()?.form.delegate?.textInput(textView, shouldChangeCharactersInRange: range, replacementString: text, cell: self) ?? true
+        
+        guard let maxLength = (row as? TextAreaConformance)?.maxLength, retVal else {
+            return retVal
+        }
+        
+        guard let value = row?.value as? String else {
+            return retVal
+        }
+        
+        let nsText = NSString(string: text)
+        let nsValue = NSString(string: value)
+        
+        return nsValue.length + nsText.length - range.length <= maxLength
     }
 
     open func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
@@ -278,7 +292,8 @@ open class AreaRow<Cell: CellType>: FormatteableRow<Cell>, TextAreaConformance w
 
     open var placeholder: String?
     open var textAreaHeight = TextAreaHeight.fixed(cellHeight: 110)
-
+    open var maxLength: Int?
+    
     public required init(tag: String?) {
         super.init(tag: tag)
     }
