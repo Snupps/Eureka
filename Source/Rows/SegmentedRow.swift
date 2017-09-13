@@ -33,7 +33,7 @@ open class SegmentedCell<T: Equatable> : Cell<T>, CellType {
     lazy open var segmentedControl : UISegmentedControl = {
         let result = UISegmentedControl()
         result.translatesAutoresizingMaskIntoConstraints = false
-        result.setContentHuggingPriority(250, for: .horizontal)
+        result.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return result
     }()
 
@@ -67,7 +67,7 @@ open class SegmentedCell<T: Equatable> : Cell<T>, CellType {
         selectionStyle = .none
         
         textLabel?.translatesAutoresizingMaskIntoConstraints = false
-        textLabel?.setContentHuggingPriority(500, for: .horizontal)
+        textLabel?.setContentHuggingPriority(.init(500), for: .horizontal)
 
         titleLabel = textLabel
         
@@ -89,7 +89,7 @@ open class SegmentedCell<T: Equatable> : Cell<T>, CellType {
         segmentedControl.isEnabled = !row.isDisabled
     }
 
-    func valueChanged() {
+    @objc func valueChanged() {
         row.value =  (row as! SegmentedRow<T>).options?[segmentedControl.selectedSegmentIndex]
     }
 

@@ -427,8 +427,8 @@ class RowsExampleViewController: FormViewController {
                         $0.placeholder = "90210"
                     }
     }
-	
-    func multipleSelectorDone(_ item:UIBarButtonItem) {
+    
+    @objc func multipleSelectorDone(_ item:UIBarButtonItem) {
         _ = navigationController?.popViewController(animated: true)
     }
     
@@ -807,7 +807,7 @@ class NativeEventFormViewController : FormViewController {
         
     }
     
-    func cancelTapped(_ barButtonItem: UIBarButtonItem) {
+    @objc func cancelTapped(_ barButtonItem: UIBarButtonItem) {
         (navigationController as? NativeEventNavigationController)?.onDismissCallback?(self)
     }
  
@@ -1584,7 +1584,7 @@ class MultivaluedController: FormViewController {
     }
 }
 
-class MultivaluedOnlyRearderController: FormViewController {
+class MultivaluedOnlyReorderController: FormViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -1728,7 +1728,7 @@ class MultivaluedOnlyDeleteController: FormViewController {
                 section2
     }
     
-    func editPressed(sender: UIBarButtonItem){
+    @objc func editPressed(sender: UIBarButtonItem){
         tableView.setEditing(!tableView.isEditing, animated: true)
         editButton.title = tableView.isEditing ? "Done" : "Edit"
         

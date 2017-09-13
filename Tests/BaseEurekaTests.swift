@@ -137,4 +137,22 @@ public class MyFormDelegate: FormDelegate {
         rowsReplacedOut += oldRows.count
     }
 
+    public func textInputShouldBeginEditing<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool {
+        return true
+    }
+    public func textInputDidBeginEditing<T>(_ textInput: UITextInput, cell: Cell<T>) {}
+    public func textInputShouldEndEditing<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool {
+        return true
+    }
+    public func textInputDidEndEditing<T>(_ textInput: UITextInput, cell: Cell<T>) {}
+    public func textInput<T>(_ textInput: UITextInput, shouldChangeCharactersInRange range: NSRange, replacementString string: String, cell: Cell<T>) -> Bool {
+        return true
+    }
+    public func textInputShouldClear<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool {
+        return true
+    }
+    public func textInputShouldReturn<T>(_ textInput: UITextInput, cell: Cell<T>) -> Bool {
+        return true
+    }
+
 }
