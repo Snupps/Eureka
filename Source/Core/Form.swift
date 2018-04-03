@@ -108,9 +108,9 @@ public final class Form {
 
     /**
      Method used to get all the values of all the rows of the form. Only rows with tag are included.
-     
+
      - parameter includeHidden: If the values of hidden rows should be included.
-     
+
      - returns: A dictionary mapping the rows tag to its value. [tag: value]
      */
     public func values(includeHidden: Bool = false) -> [String: Any?] {
@@ -124,7 +124,7 @@ public final class Form {
 
     /**
      Set values to the rows of this form
-     
+
      - parameter values: A dictionary mapping tag to value of the rows to be set. [tag: value]
      */
     public func setValues(_ values: [String: Any?]) {
@@ -361,6 +361,10 @@ extension Form {
         }
         kvoWrapper.sections.insert(section, at: formIndex == NSNotFound ? 0 : formIndex + 1 )
     }
+	
+	var containsMultivaluedSection: Bool {
+		return kvoWrapper.sections.contains { $0 is MultivaluedSection }
+	}
 
     func getValues(for rows: [BaseRow]) -> [String: Any?] {
         return rows.reduce([String: Any?]()) {
@@ -377,6 +381,7 @@ extension Form {
             return result
             } ?? [:]
     }
+
 }
 
 extension Form {

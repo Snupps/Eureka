@@ -87,19 +87,19 @@ open class FieldRow<Cell: CellType>: FormatteableRow<Cell>, FieldRowConformance,
     open var keyboardReturnType: KeyboardReturnTypeConfiguration?
 
     /// The percentage of the cell that should be occupied by the textField
-    @available (*, deprecated, message: "Use titleLabelPercentage instead")
-    open var textFieldPercentage : CGFloat? {
-        get {
-            return titlePercentage.map { 1 - $0 }
-        }
-        set {
-            titlePercentage = newValue.map { 1 - $0 }
-        }
-    }
-    
-    /// The percentage of the cell that should be occupied by the title (i.e. the titleLabel and optional imageView combined)
-    open var titlePercentage: CGFloat?
-    
+	@available (*, deprecated, message: "Use titleLabelPercentage instead")
+	open var textFieldPercentage : CGFloat? {
+		get {
+			return titlePercentage.map { 1 - $0 }
+		}
+		set {
+			titlePercentage = newValue.map { 1 - $0 }
+		}
+	}
+
+	/// The percentage of the cell that should be occupied by the title (i.e. the titleLabel and optional imageView combined)
+	open var titlePercentage: CGFloat?
+
     /// The placeholder for the textField
     open var placeholder: String?
 
@@ -139,9 +139,9 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
     private var awakeFromNibCalled = false
 
     open var dynamicConstraints = [NSLayoutConstraint]()
-    
+
     private var calculatedTitlePercentage: CGFloat = 0.7
-    
+
     public required init(style: UITableViewCellStyle, reuseIdentifier: String?) {
 
         let textField = UITextField()
@@ -336,6 +336,13 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
 
     // MARK: Helpers
 
+    private func setupTitleLabel() {
+        titleLabel = self.textLabel
+        titleLabel?.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel?.setContentHuggingPriority(UILayoutPriority(rawValue: 500), for: .horizontal)
+        titleLabel?.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: .horizontal)
+    }
+
     private func displayValue(useFormatter: Bool) -> String? {
         guard let v = row.value else { return nil }
         if let formatter = (row as? FormatterConformance)?.formatter, useFormatter {
@@ -394,28 +401,30 @@ open class _FieldCell<T> : Cell<T>, UITextFieldDelegate, TextFieldCell where T: 
     }
 
     open func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-        return formViewController()?.form.delegate?.textInputShouldEndEditing(textField, cell: self) ?? true
-    }
-    
-    open override func layoutSubviews() {
-        super.layoutSubviews()
-        guard let row = (row as? FieldRowConformance) else { return }
-        guard let titlePercentage = row.titlePercentage else  { return }
-        var targetTitleWidth = bounds.size.width * titlePercentage
-        if let imageView = imageView, let _ = imageView.image, let titleLabel = titleLabel {
-            var extraWidthToSubtract = titleLabel.frame.minX - imageView.frame.minX // Left-to-right interface layout
-            if #available(iOS 9.0, *) {
-                if UIView.userInterfaceLayoutDirection(for: self.semanticContentAttribute) == .rightToLeft {
-                    extraWidthToSubtract = imageView.frame.maxX - titleLabel.frame.maxX
-                }
-            }
-            targetTitleWidth -= extraWidthToSubtract
-        }
-        let targetTitlePercentage = targetTitleWidth / contentView.bounds.size.width
-        if calculatedTitlePercentage != targetTitlePercentage {
-            calculatedTitlePercentage = targetTitlePercentage
-            setNeedsUpdateConstraints()
-            updateConstraintsIfNeeded()
-        }
-    }
+        return formViewController()?.textInputShouldEndEditing(textField, cell: self) ?? true
+	}
+
+	open override func layoutSubviews() {
+		super.layoutSubviews()
+		guard let row = (row as? FieldRowConformance) else { return }
+		defer {
+			// As titleLabel is the textLabel, iOS may re-layout without updating constraints, for example:
+			// swiping, showing alert or actionsheet from the same section.
+			// thus we need forcing update to use customConstraints()
+			setNeedsUpdateConstraints()
+			updateConstraintsIfNeeded()
+		}
+		guard let titlePercentage = row.titlePercentage else  { return }
+		var targetTitleWidth = bounds.size.width * titlePercentage
+		if let imageView = imageView, let _ = imageView.image, let titleLabel = titleLabel {
+			var extraWidthToSubtract = titleLabel.frame.minX - imageView.frame.minX // Left-to-right interface layout
+			if #available(iOS 9.0, *) {
+				if UIView.userInterfaceLayoutDirection(for: self.semanticContentAttribute) == .rightToLeft {
+					extraWidthToSubtract = imageView.frame.maxX - titleLabel.frame.maxX
+				}
+			}
+			targetTitleWidth -= extraWidthToSubtract
+		}
+		calculatedTitlePercentage = targetTitleWidth / contentView.bounds.size.width
+	}
 }

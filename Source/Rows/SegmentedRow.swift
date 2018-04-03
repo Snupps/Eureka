@@ -105,7 +105,7 @@ open class SegmentedCell<T: Equatable> : Cell<T>, CellType {
 
     func updateSegmentedControl() {
         segmentedControl.removeAllSegments()
-        
+
         (row as! SegmentedRow<T>).options?.reversed().forEach {
             if let image = $0 as? UIImage {
                 segmentedControl.insertSegment(with: image, at: 0, animated: false)
@@ -116,7 +116,10 @@ open class SegmentedCell<T: Equatable> : Cell<T>, CellType {
     }
 
     open override func updateConstraints() {
-        guard !awakeFromNibCalled else { return }
+        guard !awakeFromNibCalled else {
+            super.updateConstraints()
+            return
+        }
         contentView.removeConstraints(dynamicConstraints)
         dynamicConstraints = []
         var views: [String: AnyObject] =  ["segmentedControl": segmentedControl]
